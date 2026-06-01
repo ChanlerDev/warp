@@ -19,6 +19,7 @@ mod pane_restoration;
 #[cfg(target_os = "macos")]
 mod preview_config_migration;
 mod remote_server;
+mod row_iterator_crash;
 mod rules;
 mod secrets;
 mod session_restoration;
@@ -63,6 +64,7 @@ use pathfinder_geometry::vector::Vector2F;
 #[cfg(target_os = "macos")]
 pub use preview_config_migration::*;
 pub use remote_server::*;
+pub use row_iterator_crash::*;
 pub use rules::*;
 use rust_embed::RustEmbed;
 pub use secrets::*;

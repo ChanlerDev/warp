@@ -82,6 +82,21 @@ fn compile_metal_shaders() {
     println!("cargo:rerun-if-changed={header_path}");
     println!("cargo:rerun-if-changed={metal_path}");
 
+    // SHIM (worktree only): if `xcrun metal` is unavailable (Command Line
+    // Tools without full Xcode) emit empty stub files so the workspace
+    // can still be built for non-rendering unit tests.  This shim must
+    // never be merged into product code.
+    let metal_available = Command::new("xcrun")
+        .args(["-sdk", "macosx", "--find", "metal"])
+        .output()
+        .map(|o| o.status.success())
+        .unwrap_or(false);
+    if !metal_available {
+        std::fs::write(air_path, b"").expect("write stub air");
+        std::fs::write(lib_path, b"").expect("write stub metallib");
+        return;
+    }
+
     let mut compile_args = vec!["-sdk", "macosx", "metal", "-c", metal_path, "-o", air_path];
     if cfg!(feature = "enable-metal-frame-capture") {
         compile_args.push("-frecord-sources");

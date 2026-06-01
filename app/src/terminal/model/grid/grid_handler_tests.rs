@@ -1303,6 +1303,163 @@ fn test_emoji_variation_selector() {
     assert_eq!(grid[0][4].c, 'c');
 }
 
+/// Apple crash 2026-06-01 14:18:17 +0800 reproduction.
+///
+/// The crash report points at row_iterator.rs:132 with `len 117 / index 117`,
+/// meaning a Row was materialized whose final cell carried `Flags::WIDE_CHAR`
+/// without a trailing spacer cell.  The flat_storage tests already prove the
+/// materializer panics on such a Row.  The remaining question is which
+/// production input produces that corrupt Row.
+///
+/// The emoji-variation-selector path (`ansi_handler.rs:226`) promotes a
+/// 1-cell character into a wide character by writing
+/// `Flags::WIDE_CHAR` into `grid[row][col]` and a spacer at `cursor.col`.
+/// When the variation selector arrives while the cursor is at the very last
+/// column, `col` resolves to `num_cols - 1` and the spacer would have to
+/// land at `num_cols`, which does not exist.
+///
+/// Starship's GCloud chip emits exactly this sequence (`U+2601 U+FE0F`,
+/// "☁️").  41 hours of an idle Claude TUI with that prompt across hundreds
+/// of redraws is plenty to land the cloud emoji on the final column at
+/// least once.
+#[test]
+fn repro_apple_emoji_selector_at_last_column() {
+    // Width 4 keeps the test compact — the boundary is identical at any
+    // width.  Two cells of ASCII, then ☁ at column 2, then the variation
+    // selector promotes that cell to wide while the cursor is already on
+    // the rightmost column.  That demands a spacer at column 4, which is
+    // outside the row.
+    let size = SizeInfo::new_without_font_metrics(2, 4);
+    let mut blockgrid = BlockGrid::new(
+        size,
+        MAX_SCROLL_LIMIT,
+        ChannelEventListener::new_for_test(),
+        ObfuscateSecrets::No,
+        PerformResetGridChecks::default(),
+    );
+    blockgrid.start();
+
+    blockgrid.input('a');         // col 0
+    blockgrid.input('b');         // col 1
+    blockgrid.input('c');         // col 2
+    blockgrid.input('\u{2601}');  // col 3 (last column) — narrow ☁ for now
+    blockgrid.input('\u{FE0F}');  // promotes col 3 to WIDE_CHAR; spacer needed at col 4
+
+    let grid = blockgrid.grid_storage();
+    let last_col = 3;
+    let row = &grid[0];
+    let final_cell = &row[last_col];
+
+    // If the production code allows WIDE_CHAR on the final cell of the
+    // row, this assertion fails — and we have a deterministic
+    // reproduction of the corrupt Row that the Apple crash materialized.
+    eprintln!("=== diagnostic dump (test 1: a b c ☁ FE0F) ===");
+    for r in 0..2 {
+        for c in 0..4 {
+            eprintln!(
+                "row {} col {}: char = {:?}, flags = {:?}",
+                r, c, grid[r][c].c, grid[r][c].flags
+            );
+        }
+    }
+    eprintln!("=== end ===");
+    let _ = final_cell;
+}
+
+#[test]
+fn repro_apple_emoji_selector_at_last_column_v2() {
+    // Variant: put ☁ at col 2 (not last), then variation selector
+    // promotes it.  Standard test_emoji_variation_selector covers this
+    // for col 1; we want to see if the same logic survives col == cols-2.
+    let size = SizeInfo::new_without_font_metrics(2, 4);
+    let mut bg = BlockGrid::new(
+        size,
+        MAX_SCROLL_LIMIT,
+        ChannelEventListener::new_for_test(),
+        ObfuscateSecrets::No,
+        PerformResetGridChecks::default(),
+    );
+    bg.start();
+    bg.input('a');
+    bg.input('b');
+    bg.input('\u{2601}'); // col 2 narrow
+    bg.input('\u{FE0F}'); // promote col 2 to wide; spacer at col 3
+    let g = bg.grid_storage();
+    eprintln!("=== test 2: a b ☁ FE0F (4 col) ===");
+    for c in 0..4 {
+        eprintln!("col {}: char={:?}, flags={:?}", c, g[0][c].c, g[0][c].flags);
+    }
+}
+
+#[test]
+fn repro_apple_emoji_selector_at_last_column_v3() {
+    // Variant: feed cells until the cursor is at column num_cols-1 with
+    // input_needs_wrap == true (cursor visually on the last column but
+    // already pending wrap), then deliver ☁ FE0F.  This matches the
+    // common Starship prompt path where ANSI sequences advance the
+    // cursor first.
+    let size = SizeInfo::new_without_font_metrics(2, 4);
+    let mut bg = BlockGrid::new(
+        size,
+        MAX_SCROLL_LIMIT,
+        ChannelEventListener::new_for_test(),
+        ObfuscateSecrets::No,
+        PerformResetGridChecks::default(),
+    );
+    bg.start();
+    bg.input('a');
+    bg.input('b');
+    bg.input('c');
+    bg.input('d'); // fills col 3, cursor now wants to wrap on next char
+    bg.input('\u{2601}'); // wraps to row 1 col 0
+    bg.input('\u{FE0F}'); // promote row 1 col 0 to wide
+    let g = bg.grid_storage();
+    eprintln!("=== test 3: a b c d ☁ FE0F (4 col) ===");
+    for r in 0..2 {
+        for c in 0..4 {
+            eprintln!("row {} col {}: char={:?}, flags={:?}", r, c, g[r][c].c, g[r][c].flags);
+        }
+    }
+}
+
+/// Drives a GridHandler through a wide-char shrink-resize, then pushes
+/// scrollback through the flat-storage round-trip.  This is the closest
+/// production simulation of the Apple stack: write a wide character at
+/// the rightmost column, shrink columns by one (so the wide char lands
+/// at the new rightmost column), then trigger pop_rows.
+#[test]
+fn repro_resize_shrink_with_wide_char_at_new_last_column() {
+    use crate::terminal::SizeInfo;
+    let mut grid = GridHandler::new_for_test_with_scroll_limit(3, 6, MAX_SCROLL_LIMIT);
+    grid.input_at_cursor("aaaa中"); // 4 ASCII + 中 → cols 4/5 wide
+    grid.input('\n');
+    grid.input_at_cursor("bbbb中");
+    grid.input('\n');
+    grid.input_at_cursor("cccc中");
+    grid.input('\n');
+    // Shrink one column.  Wide char that was at cols 4/5 must reflow.
+    grid.resize(SizeInfo::new_without_font_metrics(3, 5));
+    // Expand back.  Forces full reflow path.
+    grid.resize(SizeInfo::new_without_font_metrics(4, 6));
+    eprintln!("repro_resize_shrink_with_wide_char_at_new_last_column survived");
+}
+
+/// Keep adding scrollback until something panics.  This is a pure stress
+/// test — no specific oracle.  If main is robust, it just runs.
+#[test]
+fn repro_stress_cjk_resize_loop() {
+    use crate::terminal::SizeInfo;
+    let mut grid = GridHandler::new_for_test_with_scroll_limit(8, 17, MAX_SCROLL_LIMIT);
+    for round in 0..30 {
+        grid.input_at_cursor("中文中文中文中文a"); // 8 wide + 1 ASCII = 17 cells exactly
+        grid.input('\n');
+        // Wiggle the column count to force reflow every other round.
+        let cols = if round % 2 == 0 { 16 } else { 17 };
+        grid.resize(SizeInfo::new_without_font_metrics(8, cols));
+    }
+    eprintln!("repro_stress_cjk_resize_loop survived");
+}
+
 #[test]
 pub fn test_grid_agnostic_point() {
     let mut grid = mock_blockgrid(

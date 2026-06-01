@@ -207,6 +207,166 @@ fn test_styling_change_within_trailing_empty_cells() {
     assert!(!flat_rows[1][0].flags.intersects(Flags::BOLD));
 }
 
+// === Repro for Apple crash report 2026-06-01 14:18:17 ===
+//
+// Apple stack hits `RowIterator::next` -> `FlatStorage::pop_rows` ->
+// `GridHandler::resize_storage` after a CJK-heavy session in WarpPreview
+// `0.2026.05.27.15.44.preview_01`.  Panic text: `index out of bounds: the
+// len is 117 but the index is 117`.
+//
+// These tests probe the materialization path itself (`RowIterator::next` at
+// `row[idx + 1]`) by feeding the index a row that legitimately ends with a
+// wide character + spacer pair, then asking flat storage to round-trip the
+// content.  Each scenario is documented inline so a future maintainer can
+// see exactly which boundary it exercises.
+#[test]
+fn repro_wide_char_at_last_column_roundtrip() {
+    // Width-5 storage carrying "aaa中" — three ASCII cells then a CJK
+    // grapheme that must occupy cells 3 and 4.  This is the simplest shape
+    // that mirrors the Apple panic: the wide character lands in the final
+    // column.  RowIterator::next must not over-write past the end of the
+    // 5-cell row when re-materializing this row.
+    let num_cols = 5;
+    let rows = "aaa中\n".to_rows(num_cols);
+
+    let mut storage = FlatStorage::new(num_cols, None, None);
+    storage.push_rows(&rows);
+
+    let flat_rows = storage
+        .rows_from(0)
+        .map(|row| row.as_ref().clone())
+        .collect_vec();
+
+    assert_rows_equal(&flat_rows, &rows);
+}
+
+#[test]
+fn repro_wide_char_after_set_columns_shrink() {
+    // Push a row with a CJK grapheme at columns 5/6 in a 7-column storage,
+    // then shrink to 6 columns.  Index::rebuild reflows the row; if the
+    // reflow lets the wide character land on the final cell instead of
+    // wrapping, RowIterator::next will write to row[idx + 1] past the end.
+    let num_cols = 7;
+    let rows = "abcde中\n".to_rows(num_cols);
+
+    let mut storage = FlatStorage::new(num_cols, None, None);
+    storage.push_rows(&rows);
+
+    storage.set_columns(6);
+
+    let flat_rows = storage
+        .rows_from(0)
+        .map(|row| row.as_ref().clone())
+        .collect_vec();
+
+    // We don't care about the exact layout — the failure mode is panic
+    // during materialization.  Just make sure we got at least one row out.
+    assert!(!flat_rows.is_empty());
+}
+
+#[test]
+fn repro_wide_char_after_pop_rows_117_columns() {
+    // Mimic the Apple report's terminal width (117 cols) with CJK-heavy
+    // scrollback and many rows, so that pop_rows has to materialize each
+    // row through RowIterator.  If any row ends up with a wide character
+    // in the final column after Index::rebuild, this should panic.
+    let num_cols = 117;
+    let mut content = String::new();
+    for _ in 0..50 {
+        // Fill with CJK characters — each is 2 cells wide.  117 is odd so
+        // a pure CJK fill leaves one ASCII column at the end.  Insert a
+        // single ASCII at the row start to push the trailing CJK into the
+        // last two columns: 1 + 58 * 2 = 117 → final wide char on cols
+        // 115/116.  When set_columns shrinks by 1, the wide char would
+        // land on cols 114/115, but the trailing ASCII at offset 1 means
+        // the last grapheme ends exactly at the new boundary.
+        content.push('a');
+        for _ in 0..58 {
+            content.push('中');
+        }
+        content.push('\n');
+    }
+
+    let rows = content.as_str().to_rows(num_cols);
+    let mut storage = FlatStorage::new(num_cols, None, None);
+    storage.push_rows(&rows);
+
+    // Resize down by one column — exactly the boundary that the
+    // production reflow path hits when the user nudges the window or
+    // closes a pane.
+    storage.set_columns(num_cols - 1);
+
+    // Force materialization of every row, the same way pop_rows does.
+    let _ = storage
+        .rows_from(0)
+        .map(|row| row.as_ref().clone())
+        .collect_vec();
+}
+
+/// Construct a Row that violates the wrap invariant: the wide character
+/// is placed at the absolute final cell, with no spacer cell after it.
+/// This mirrors the corrupt state that a buggy upstream resize path
+/// could leave behind, and that #10305 was supposed to prevent.
+fn build_corrupt_row_wide_at_end(cols: usize) -> Row {
+    let mut row = Row::new(cols);
+    // Fill cols 0..cols-1 with ASCII to keep the row contiguous.
+    for i in 0..cols - 1 {
+        let cell = &mut row[i];
+        cell.c = ('a' as u32 + (i as u32 % 26)) as u8 as char;
+    }
+    // Final cell holds the leading half of a wide char without a
+    // spacer to its right (which is impossible in a 1D row).
+    let last = &mut row[cols - 1];
+    last.c = '中';
+    last.flags.insert(Flags::WIDE_CHAR);
+    row.occ = cols;
+    row
+}
+
+#[test]
+fn repro_corrupt_row_wide_char_at_last_cell_panics() {
+    // Push a hand-built Row whose final cell is marked WIDE_CHAR with no
+    // spacer after it.  push_rows -> push_rows_internal goes through
+    // process_grapheme_info_unchecked which does NOT enforce the wrap
+    // invariant, so the corruption propagates into the index.  Once
+    // RowIterator tries to materialize the row it should panic exactly
+    // like the Apple stack:
+    //
+    //   index out of bounds: the len is N but the index is N
+    //
+    // If this test passes silently, the materializer somehow tolerated
+    // the corruption.  If it panics, we have reproduced the production
+    // crash without going through the UI.
+    let cols = 117;
+    let row = build_corrupt_row_wide_at_end(cols);
+
+    let mut storage = FlatStorage::new(cols, None, None);
+    storage.push_rows([&row]);
+
+    // pop_rows is the exact entry point in the Apple stack.
+    let _ = storage.pop_rows(1);
+}
+
+#[test]
+fn repro_corrupt_row_then_set_columns_then_pop_rows() {
+    // Variant: push corrupt row first, then run set_columns (full reflow
+    // path) and finally pop_rows.  Apple crash hit a 117-column
+    // GridHandler::resize_storage, which calls set_columns followed by
+    // pop_rows under the hood.
+    let cols = 117;
+    let row = build_corrupt_row_wide_at_end(cols);
+
+    let mut storage = FlatStorage::new(cols, None, None);
+    storage.push_rows([&row]);
+
+    // Trigger Index::rebuild — the same path as resize_storage's full
+    // reflow branch.  If rebuild can't sanitize the corruption, the
+    // following materialization should explode.
+    storage.set_columns(cols);
+
+    let _ = storage.pop_rows(1);
+}
+
 #[test]
 fn test_clear_after_truncate_front() {
     let num_cols = 20;
