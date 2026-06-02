@@ -53,6 +53,27 @@ shell `clear`，再循环 resize。
 坏 Row 的最短 public ANSI 序列，因此报告不把 `☁️` 或任一单独 ANSI 序列误报
 为唯一根因。
 
+## 证据边界
+
+未修复 main 的 `FlatStorage` 对照测试可稳定触发与 Apple 报告相同的越界形态：
+
+```text
+index out of bounds: the len is 5 but the index is 5
+crates/warp_terminal/src/model/grid/flat_storage/row_iterator.rs:132
+```
+
+尝试把 CLI-agent integration 用例移植到 pre-#10305 commit `1f72e823` 做 GUI
+对照，但该历史版本在当前机器进入测试前即链接失败：
+
+```text
+Undefined symbols for architecture x86_64:
+  "_configureAndRunModal"
+```
+
+因此不能声称产品级 integration 已在历史版本上观察到 panic。当前能严格确认的
+范围是：单元测试稳定复现消费者崩溃，integration 覆盖真实 CLI-agent 暴露链路，
+修复后两者均通过。
+
 ## 验证
 
 ```text
@@ -61,5 +82,10 @@ cargo test -p warp_terminal flat_storage -- --nocapture
 
 cargo run -p integration --bin integration -- \
   test_row_iterator_panic_on_resize_with_cjk_scrollback
+# passed
+
+cargo test -p warp \
+  test_full_grid_clear_resize_then_scroll_does_not_panic_on_row_iteration -- \
+  --nocapture
 # passed
 ```
