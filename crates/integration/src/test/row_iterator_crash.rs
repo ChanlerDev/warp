@@ -20,9 +20,9 @@
 //!
 //! 1. Bootstrap a single-pane terminal at a custom narrow window size so the
 //!    columns approach the same odd-ish boundary class as the crash (~117).
-//! 2. Pump a long burst of CJK + emoji-with-variation-selector glyphs into
-//!    the active block, so wide-char graphemes land repeatedly on the right
-//!    edge of `flat_storage` and accumulate in scrollback.
+//! 2. Emit a real CLI-agent `session_start` OSC notification, then repeatedly
+//!    force an emoji-with-variation-selector glyph onto the right edge of the
+//!    active block and accumulate the resulting rows in scrollback.
 //! 3. Issue `clear` so the model walks the `finish_background_block` /
 //!    `clear_visible_screen` path that precedes the crashing reflow on Apple
 //!    crash reports.
@@ -33,14 +33,6 @@
 //!    `RowIterator::next` ever panics, the entire test process terminates,
 //!    so the assertion never runs and the test fails.
 //!
-//! NOTE: this test is a *regression scaffold*. On the current `master` the
-//! known ANSI public entry points are not yet known to deterministically
-//! produce a `Flags::WIDE_CHAR` cell at the last column, so the test may
-//! pass even when the underlying defect is still latent. It is wired up so
-//! that future input fuzzing or a `debug_assert!` in
-//! `flat_storage::push_rows_internal` can be added without rewriting the
-//! harness.
-
 use std::time::Duration;
 
 use pathfinder_geometry::rect::RectF;
@@ -57,9 +49,8 @@ use warpui::{async_assert, ViewHandle};
 
 use super::{new_builder, Builder};
 
-/// Number of scrollback lines we attempt to fill with wide chars. Larger
-/// values increase the chance that some transient parser state leaves a
-/// `WIDE_CHAR` cell on the right edge during reflow.
+/// Number of corrupt right-edge rows we push into scrollback before exposing
+/// the invalid row through a clear + resize reflow.
 const SCROLLBACK_LINES: usize = 400;
 
 /// Window widths we cycle through. Each transition forces a full reflow
@@ -70,25 +61,19 @@ const SCROLLBACK_LINES: usize = 400;
 /// on the exact font metrics, which vary by platform.
 const RESIZE_WIDTHS: &[f32] = &[700.0, 480.0, 880.0, 360.0, 960.0, 600.0];
 
-/// Build the long CJK + emoji-presentation string we feed through the PTY.
-///
-/// One unit mixes naked CJK wide chars (`中文`), a narrow base + VS-16 that
-/// promotes to wide (`☁\u{FE0F}`), and a trailing ASCII tail so wrap
-/// boundaries shift between lines.
-fn payload_unit() -> &'static str {
-    "中文中文中\u{2601}\u{FE0F}x"
-}
-
-/// `printf` invocation that pushes the wide-char payload through the shell.
+/// `printf` invocation that enters CLI-agent mode and pushes corrupt
+/// right-edge rows through the shell.
 ///
 /// We deliberately avoid embedding raw newlines in the command line — the
 /// shell would split a multi-line command into separate prompt entries and
 /// the integration test's "command executed" assertion would never see the
-/// full command. Instead we drive the loop inside the shell with `seq`.
-fn payload_command() -> String {
+/// full command. The session-start notification and payload intentionally run
+/// in the same foreground block: that is the block switched to full-grid clear
+/// behavior by `CLIAgentSessionsModelEvent::Started`.
+fn cli_agent_right_edge_payload_command() -> String {
     format!(
-        "for i in $(seq 1 {SCROLLBACK_LINES}); do printf '{unit}\\n'; done",
-        unit = payload_unit(),
+        "printf '\\033]777;notify;warp://cli-agent;{{\"v\":1,\"agent\":\"claude\",\"event\":\"session_start\",\"session_id\":\"rowiter-repro\",\"cwd\":\"/tmp\",\"project\":\"rowiter-repro\",\"plugin_version\":\"1.1.0\"}}\\007'; \
+         for i in $(seq 1 {SCROLLBACK_LINES}); do printf '\\033[999C☁️\\r\\n'; done",
     )
 }
 
@@ -103,10 +88,7 @@ fn resize_window_width(new_width: f32) -> TestStep {
             let bounds = app
                 .window_bounds(&window_id)
                 .expect("window bounds should exist");
-            let new_bounds = RectF::new(
-                bounds.origin(),
-                vec2f(new_width, bounds.size().y()),
-            );
+            let new_bounds = RectF::new(bounds.origin(), vec2f(new_width, bounds.size().y()));
             app.update(|ctx| {
                 ctx.set_and_cache_window_bounds(window_id, new_bounds);
             });
@@ -122,7 +104,7 @@ pub fn test_row_iterator_panic_on_resize_with_cjk_scrollback() -> Builder {
         .with_step(wait_until_bootstrapped_single_pane_for_tab(0))
         .with_step(execute_command_for_single_terminal_in_tab(
             0,
-            payload_command(),
+            cli_agent_right_edge_payload_command(),
             ExpectedExitStatus::Success,
             (),
         ))
