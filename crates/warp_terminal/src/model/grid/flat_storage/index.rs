@@ -500,7 +500,7 @@ impl EntryBuilder {
 
     /// Processes the next grapheme in the row, based only on its sizing
     /// information (and not its content).
-    fn process_grapheme_info(&mut self, info: GraphemeInfo, index: &mut Index) {
+    pub(super) fn process_grapheme_info(&mut self, info: GraphemeInfo, index: &mut Index) {
         let grapheme_len = info.utf8_bytes.get() as usize;
         debug_assert!(
             grapheme_len > 0,

@@ -7,3 +7,8 @@
 ## Notes
 
 - [2026-06-01 RowIterator 越界崩溃 — 综合档](notes/2026-06-01-row-iterator-crash-bug.md)
+- [2026-06-02 RowIterator 越界崩溃修复报告](notes/2026-06-02-row-iterator-crash-fix-report.md)
+
+## Decisions
+
+- [ADR-001: Harden FlatStorage Row Ingestion](decisions/adr-001-harden-flat-storage-row-ingestion.md)

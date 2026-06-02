@@ -400,13 +400,48 @@ BEL
 
 ### 10.7 确定性坏 Row 生产入口
 
-继续沿 ANSI 输入链路检查后，发现 emoji variation selector 的生产路径可直接构造
-非法 Row。`ansi_handler.rs` 在接收 `U+FE0F` 时，会把前一个窄字符提升为
-`WIDE_CHAR`，并在当前 cursor 位置写入 `WIDE_CHAR_SPACER`。如果基础字符
-`U+2601` 已经写在最后一列，提升后的宽字符没有合法 spacer 位置。
+探索阶段曾怀疑 emoji variation selector 可直接构造非法 Row。单测推翻了这个
+判断：如果基础字符 `U+2601` 已在最后一列，接收 `U+FE0F` 后该格会变成孤立
+`WIDE_CHAR_SPACER`，但不会生成 Apple 栈所需的“最后一列 `WIDE_CHAR`”。
 
-Integration 不再依赖随机 CJK 换行碰撞，而是使用 ANSI `CSI 999 C` 将 cursor
-夹到最右列，再输出 `☁️` 和换行。命令先输出真实 OSC 777 CLI-agent
-`session_start`，随后在同一个 foreground block 内循环输出边界 payload，确保
-坏 Row 的生产覆盖 CLI-agent full-grid clear 模式。最后仍通过 shell `clear` 和
-窗口 resize 触发 `FlatStorage::pop_rows`。
+因此 `☁️` 不是已证明的直接 producer，只保留在 integration 压力 payload 中作为
+边界覆盖。当前已证明的是更通用的 failure class：只要较宽 Row 被写入较窄
+`FlatStorage`，或者上游交付最后一列带 `WIDE_CHAR` 的非法 Row，
+`push_rows_internal` 的 unchecked builder 就会把坏 index 保存下来，随后
+`RowIterator::next` 在 spacer 写入时越界。
+
+### 10.8 修复前后证据
+
+未修复 main 对照 worktree 中，运行：
+
+```text
+cargo test -p warp_terminal repro_mismatched_storage_columns_with_trailing_wide_char -- --nocapture
+```
+
+稳定得到：
+
+```text
+row_iterator.rs:132:20
+index out of bounds: the len is 5 but the index is 5
+```
+
+这与 Apple 报告的 `len is 117 but the index is 117` 是同一失败形状。
+
+修复策略：
+
+1. `FlatStorage::push_rows_internal` 检测列数不一致或尾部非法 `WIDE_CHAR`；
+2. 正常 Row 保持 unchecked fast path；
+3. 异常 Row 使用 checked `EntryBuilder` 自动 reflow；
+4. `RowIterator` 对已经存在的坏 index 增加越界保护，记录 warning 并丢弃非法
+   wide-char flags，不再拉崩整个进程。
+
+修复后：
+
+```text
+cargo test -p warp_terminal flat_storage -- --nocapture
+# 33 passed, 2 ignored
+
+cargo run -p integration --bin integration -- \
+  test_row_iterator_panic_on_resize_with_cjk_scrollback
+# passed
+```

@@ -187,6 +187,12 @@ impl FlatStorage {
         let mut bg_and_style = self.bg_and_style_map.tail();
 
         for row in rows {
+            let row_requires_checked_indexing = row.len() != self.columns
+                || row.dirty_cells().iter().enumerate().any(|(idx, cell)| {
+                    idx >= self.columns
+                        || (idx + 1 >= self.columns
+                            && cell.flags().intersects(cell::Flags::WIDE_CHAR))
+                });
             let start_offset = ByteOffset::from(self.content().end_offset());
             let mut entry_builder = self.index.start_row();
 
@@ -243,12 +249,25 @@ impl FlatStorage {
                     for _ in last_cell..(idx - 1) {
                         // We skipped a bunch of empty cells, but having hit a
                         // content-ful cell, we need to add them back in.
-                        entry_builder
-                            .process_grapheme_info_unchecked(Grapheme::EMPTY_CELL.sizing_info());
+                        if row_requires_checked_indexing {
+                            entry_builder.process_grapheme_info(
+                                Grapheme::EMPTY_CELL.sizing_info(),
+                                &mut self.index,
+                            );
+                        } else {
+                            entry_builder.process_grapheme_info_unchecked(
+                                Grapheme::EMPTY_CELL.sizing_info(),
+                            );
+                        }
                         self.content.push_grapheme(&Grapheme::EMPTY_CELL);
                     }
                     last_cell = idx;
-                    entry_builder.process_grapheme_info_unchecked(grapheme.sizing_info());
+                    if row_requires_checked_indexing {
+                        entry_builder
+                            .process_grapheme_info(grapheme.sizing_info(), &mut self.index);
+                    } else {
+                        entry_builder.process_grapheme_info_unchecked(grapheme.sizing_info());
+                    }
                     self.content.push_grapheme(&grapheme);
                 }
             }
