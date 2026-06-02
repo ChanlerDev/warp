@@ -2562,6 +2562,41 @@ impl GridHandler {
         max_col
     }
 
+    /// Constructs a row with a WIDE_CHAR in the last cell and no trailing
+    /// WIDE_CHAR_SPACER, then pushes it directly into `flat_storage`.
+    ///
+    /// This bypasses ANSI parsing to inject a corrupt row of the kind that a
+    /// buggy upstream resize path could leave behind.  The subsequent
+    /// clear+resize reflow will exercise the checked-indexing fallback.
+    #[cfg(any(test, feature = "integration_tests"))]
+    pub fn push_corrupt_row_for_test(&mut self, cols: usize) {
+        use warp_terminal::model::VisiblePoint;
+
+        let mut row = Row::new(cols);
+        // Fill cols 0..cols-1 with ASCII to keep the row contiguous.
+        for i in 0..cols - 1 {
+            row[i].c = ('a' as u32 + (i as u32 % 26)) as u8 as char;
+        }
+        // Final cell: wide character without a spacer.
+        let last = &mut row[cols - 1];
+        last.c = '\u{4e2d}';
+        last.flags.insert(Flags::WIDE_CHAR);
+        row.occ = cols;
+
+        // Push corrupt rows into the visible grid so they participate in
+        // the full reflow path: resize_storage pushes grid rows into
+        // flat_storage, then pop_rows materializes them through
+        // RowIterator::next, which panics on the corrupt wide char.
+        let visible_rows = self.grid.visible_rows();
+        for i in 0..visible_rows {
+            self.grid[VisibleRow(i)] = row.clone();
+        }
+        self.grid.max_cursor_point = VisiblePoint {
+            row: VisibleRow(visible_rows - 1),
+            col: cols - 1,
+        };
+    }
+
     /// Inserts the characters within `text` into the grid starting at the
     /// cursor.
     ///

@@ -1339,11 +1339,11 @@ fn repro_apple_emoji_selector_at_last_column() {
     );
     blockgrid.start();
 
-    blockgrid.input('a');         // col 0
-    blockgrid.input('b');         // col 1
-    blockgrid.input('c');         // col 2
-    blockgrid.input('\u{2601}');  // col 3 (last column) — narrow ☁ for now
-    blockgrid.input('\u{FE0F}');  // promotes col 3 to WIDE_CHAR; spacer needed at col 4
+    blockgrid.input('a'); // col 0
+    blockgrid.input('b'); // col 1
+    blockgrid.input('c'); // col 2
+    blockgrid.input('\u{2601}'); // col 3 (last column) — narrow ☁ for now
+    blockgrid.input('\u{FE0F}'); // promotes col 3 to WIDE_CHAR; spacer needed at col 4
 
     let grid = blockgrid.grid_storage();
     let last_col = 3;
@@ -1417,7 +1417,10 @@ fn repro_apple_emoji_selector_at_last_column_v3() {
     eprintln!("=== test 3: a b c d ☁ FE0F (4 col) ===");
     for r in 0..2 {
         for c in 0..4 {
-            eprintln!("row {} col {}: char={:?}, flags={:?}", r, c, g[r][c].c, g[r][c].flags);
+            eprintln!(
+                "row {} col {}: char={:?}, flags={:?}",
+                r, c, g[r][c].c, g[r][c].flags
+            );
         }
     }
 }

@@ -7,6 +7,7 @@
 use super::integration_tests;
 
 integration_tests! {
+    test_row_iterator_crash_multi_pane_with_tab_close,
     test_add_many_sessions,
     test_ctrl_tab_session_switching,
     test_hover_over_menu,
