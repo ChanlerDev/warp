@@ -1,0 +1,308 @@
+2026-06-01T06:13:25Z [INFO] Websocket for CloudObjects::Listener is done; restarting after 0s.
+2026-06-01T06:13:25Z [INFO] Attempting to start websocket connection in CloudObjects::Listener
+2026-06-01T06:13:26Z [INFO] Websocket reconnected after 742.054416ms, within the 60s refresh threshold; skipping out-of-band refresh.
+2026-06-01T06:13:26Z [INFO] Websocket reconnected after 745.287833ms, within the 60s refresh threshold; skipping out-of-band refresh.
+2026-06-01T06:13:26Z [INFO] Websocket reconnected after 1.030868833s, within the 60s refresh threshold; skipping out-of-band refresh.
+2026-06-01T06:13:26Z [INFO] Websocket reconnected after 1.032853333s, within the 60s refresh threshold; skipping out-of-band refresh.
+2026-06-01T06:14:05Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 1..1}
+2026-06-01T06:14:05Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 2..2}
+2026-06-01T06:14:05Z [INFO] window resized
+2026-06-01T06:14:05Z [INFO] dispatching global action for workspace:save_app
+2026-06-01T06:14:05Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 3..3}
+2026-06-01T06:14:05Z [INFO] window resized
+2026-06-01T06:14:05Z [INFO] dispatching global action for workspace:save_app
+2026-06-01T06:14:06Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 5..5}
+2026-06-01T06:14:06Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 6..6}
+2026-06-01T06:14:06Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 7..7}
+2026-06-01T06:14:06Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 9..9}
+2026-06-01T06:14:06Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 10..10}
+2026-06-01T06:14:06Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 11..11}
+2026-06-01T06:14:07Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:14:07Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:14:07Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 1..1}
+2026-06-01T06:14:07Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 2..2}
+2026-06-01T06:14:07Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:14:07Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:14:07Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:14:07Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:14:08Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 1..1}
+2026-06-01T06:14:08Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 2..2}
+2026-06-01T06:14:08Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 3..3}
+2026-06-01T06:14:08Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 5..5}
+2026-06-01T06:14:08Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 3..3}
+2026-06-01T06:14:08Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 5..5}
+2026-06-01T06:14:09Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 6..6}
+2026-06-01T06:14:09Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 8..8}
+2026-06-01T06:14:09Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 9..9}
+2026-06-01T06:14:09Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 10..10}
+2026-06-01T06:14:09Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 11..11}
+2026-06-01T06:14:09Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 13..13}
+2026-06-01T06:14:09Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 14..14}
+2026-06-01T06:14:09Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:14:09Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:14:10Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::KeyDown
+2026-06-01T06:14:22Z [INFO] dispatching action for "root_view:maybe_stop_active_voice_input"
+2026-06-01T06:14:22Z [INFO] dispatching global action for root_view:update_quake_mode_state
+2026-06-01T06:14:22Z [INFO] active window changed: None
+2026-06-01T06:14:22Z [INFO] dispatching global action for root_view:update_quake_mode_state
+2026-06-01T06:14:22Z [INFO] dispatching global action for workspace:save_app
+2026-06-01T06:15:36Z [INFO] application did become active
+2026-06-01T06:15:36Z [INFO] dispatching typed action: warp::pane_group::PaneGroupAction::ResizeMove(Vector2F(F32x2([1405.7578, 421.52344])))
+2026-06-01T06:15:36Z [INFO] active window changed: Some(WindowId(0))
+2026-06-01T06:15:36Z [INFO] dispatching global action for root_view:update_quake_mode_state
+2026-06-01T06:15:36Z [INFO] dispatching global action for workspace:save_app
+2026-06-01T06:15:36Z [INFO] dispatching typed action: warp::pane_group::PaneGroupAction::ResizeMove(Vector2F(F32x2([1405.7578, 421.52344])))
+2026-06-01T06:15:36Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:15:36Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::BlockSelect(MouseUp { block_index: BlockIndex(3), is_ctrl_down: false, is_cmd_down: false, is_shift_down: false })
+2026-06-01T06:15:36Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClickOnGrid { position: BlockList(WithinBlock { block_index: BlockIndex(3), grid: Output, inner: Point { row: 2507, col: 111 } }), modifiers: ModifiersState { alt: false, cmd: false, shift: false, ctrl: false, func: false } }
+2026-06-01T06:15:48Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 1..1}
+2026-06-01T06:15:48Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 2..2}
+2026-06-01T06:15:48Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 3..3}
+2026-06-01T06:15:48Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 5..5}
+2026-06-01T06:15:48Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 6..6}
+2026-06-01T06:15:48Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 7..7}
+2026-06-01T06:15:49Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 9..9}
+2026-06-01T06:15:49Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 10..10}
+2026-06-01T06:15:49Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 11..11}
+2026-06-01T06:15:49Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 12..12}
+2026-06-01T06:15:49Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 13..13}
+2026-06-01T06:15:49Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 15..15}
+2026-06-01T06:15:49Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 16..16}
+2026-06-01T06:15:49Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 18..18}
+2026-06-01T06:15:49Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 19..19}
+2026-06-01T06:15:49Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 20..20}
+2026-06-01T06:15:50Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 21..21}
+2026-06-01T06:15:50Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 23..23}
+2026-06-01T06:15:50Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 24..24}
+2026-06-01T06:15:50Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 25..25}
+2026-06-01T06:15:50Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 26..26}
+2026-06-01T06:15:50Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 28..28}
+2026-06-01T06:15:50Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 29..29}
+2026-06-01T06:15:50Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:15:50Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:15:51Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:15:51Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:15:51Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 1..1}
+2026-06-01T06:15:51Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 2..2}
+2026-06-01T06:15:51Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 3..3}
+2026-06-01T06:15:51Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 5..5}
+2026-06-01T06:15:51Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 6..6}
+2026-06-01T06:15:52Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:15:52Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:15:52Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 1..1}
+2026-06-01T06:15:53Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 0..0}
+2026-06-01T06:15:53Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 1..1}
+2026-06-01T06:15:53Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 2..2}
+2026-06-01T06:15:53Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 3..3}
+2026-06-01T06:15:53Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 5..5}
+2026-06-01T06:15:53Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 6..6}
+2026-06-01T06:15:53Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 7..7}
+2026-06-01T06:15:54Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:15:54Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:15:54Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 1..1}
+2026-06-01T06:15:54Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 2..2}
+2026-06-01T06:15:55Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 3..3}
+2026-06-01T06:15:55Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 5..5}
+2026-06-01T06:15:55Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 6..6}
+2026-06-01T06:15:55Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 7..7}
+2026-06-01T06:15:55Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 9..9}
+2026-06-01T06:15:55Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 10..10}
+2026-06-01T06:15:55Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 11..11}
+2026-06-01T06:15:55Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 12..12}
+2026-06-01T06:15:56Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:15:56Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:15:57Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 1..1}
+2026-06-01T06:15:57Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:15:57Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:15:57Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:15:57Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:15:57Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 1..1}
+2026-06-01T06:15:57Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 2..2}
+2026-06-01T06:15:57Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 3..3}
+2026-06-01T06:15:58Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 5..5}
+2026-06-01T06:15:58Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 6..6}
+2026-06-01T06:15:58Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 7..7}
+2026-06-01T06:15:58Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 9..9}
+2026-06-01T06:15:58Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 10..10}
+2026-06-01T06:15:58Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 11..11}
+2026-06-01T06:15:58Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 12..12}
+2026-06-01T06:15:58Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 14..14}
+2026-06-01T06:15:58Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 15..15}
+2026-06-01T06:15:59Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 16..16}
+2026-06-01T06:15:59Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 18..18}
+2026-06-01T06:15:59Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 19..19}
+2026-06-01T06:15:59Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 20..20}
+2026-06-01T06:15:59Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 22..22}
+2026-06-01T06:15:59Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 23..23}
+2026-06-01T06:16:00Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 25..25}
+2026-06-01T06:16:00Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 26..26}
+2026-06-01T06:16:00Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 27..27}
+2026-06-01T06:16:00Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 28..28}
+2026-06-01T06:16:00Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:16:00Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:16:00Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:16:00Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:17:43Z [INFO] dispatching action for "root_view:maybe_stop_active_voice_input"
+2026-06-01T06:17:43Z [INFO] dispatching global action for root_view:update_quake_mode_state
+2026-06-01T06:17:43Z [INFO] active window changed: None
+2026-06-01T06:17:43Z [INFO] dispatching global action for root_view:update_quake_mode_state
+2026-06-01T06:17:43Z [INFO] dispatching global action for workspace:save_app
+2026-06-01T06:17:44Z [INFO] application did become active
+2026-06-01T06:17:44Z [INFO] active window changed: Some(WindowId(0))
+2026-06-01T06:17:44Z [INFO] dispatching global action for root_view:update_quake_mode_state
+2026-06-01T06:17:44Z [INFO] dispatching global action for workspace:save_app
+2026-06-01T06:17:44Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:17:49Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 1..1}
+2026-06-01T06:17:49Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 2..2}
+2026-06-01T06:17:50Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 3..3}
+2026-06-01T06:17:50Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 5..5}
+2026-06-01T06:17:50Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 7..7}
+2026-06-01T06:17:50Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 8..8}
+2026-06-01T06:17:50Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 9..9}
+2026-06-01T06:17:50Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 11..11}
+2026-06-01T06:17:51Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 12..12}
+2026-06-01T06:17:51Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 13..13}
+2026-06-01T06:17:51Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 15..15}
+2026-06-01T06:17:51Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 16..16}
+2026-06-01T06:17:51Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 17..17}
+2026-06-01T06:17:52Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 19..19}
+2026-06-01T06:17:52Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 20..20}
+2026-06-01T06:17:52Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 21..21}
+2026-06-01T06:17:52Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 23..23}
+2026-06-01T06:17:52Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 24..24}
+2026-06-01T06:17:52Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 26..26}
+2026-06-01T06:17:52Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 27..27}
+2026-06-01T06:17:52Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 28..28}
+2026-06-01T06:17:53Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 30..30}
+2026-06-01T06:17:53Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 31..31}
+2026-06-01T06:17:53Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 32..32}
+2026-06-01T06:17:53Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 33..33}
+2026-06-01T06:17:53Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 34..34}
+2026-06-01T06:17:53Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 35..35}
+2026-06-01T06:17:53Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:17:53Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:17:54Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ControlSequence
+2026-06-01T06:17:54Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ControlSequence
+2026-06-01T06:17:54Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 1..1}
+2026-06-01T06:17:54Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 2..2}
+2026-06-01T06:17:55Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 3..3}
+2026-06-01T06:17:55Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 5..5}
+2026-06-01T06:17:55Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 6..6}
+2026-06-01T06:17:55Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 7..7}
+2026-06-01T06:17:55Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 8..8}
+2026-06-01T06:17:55Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 9..9}
+2026-06-01T06:17:55Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 10..10}
+2026-06-01T06:17:56Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:17:56Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:17:56Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 1..1}
+2026-06-01T06:17:56Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 2..2}
+2026-06-01T06:17:56Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:17:56Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:17:57Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:17:57Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:17:57Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 1..1}
+2026-06-01T06:17:57Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 2..2}
+2026-06-01T06:17:57Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 4..4}
+2026-06-01T06:17:57Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 5..5}
+2026-06-01T06:17:58Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 4..4}
+2026-06-01T06:17:58Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 2..2}
+2026-06-01T06:17:58Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 4..4}
+2026-06-01T06:17:58Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 5..5}
+2026-06-01T06:17:58Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:17:58Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:17:59Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 1..1}
+2026-06-01T06:17:59Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 2..2}
+2026-06-01T06:17:59Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 3..3}
+2026-06-01T06:18:00Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 5..5}
+2026-06-01T06:18:00Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 6..6}
+2026-06-01T06:18:00Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:18:00Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:18:01Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 1..1}
+2026-06-01T06:18:01Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 2..2}
+2026-06-01T06:18:01Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 3..3}
+2026-06-01T06:18:02Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 5..5}
+2026-06-01T06:18:02Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 6..6}
+2026-06-01T06:18:02Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 7..7}
+2026-06-01T06:18:02Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:18:02Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:18:02Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 1..1}
+2026-06-01T06:18:02Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:18:02Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:18:03Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 1..1}
+2026-06-01T06:18:03Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 2..2}
+2026-06-01T06:18:03Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 3..3}
+2026-06-01T06:18:03Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 4..4}
+2026-06-01T06:18:03Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 6..6}
+2026-06-01T06:18:03Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 7..7}
+2026-06-01T06:18:03Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:18:03Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:18:04Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 1..1}
+2026-06-01T06:18:04Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 2..2}
+2026-06-01T06:18:04Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 3..3}
+2026-06-01T06:18:04Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 5..5}
+2026-06-01T06:18:05Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 6..6}
+2026-06-01T06:18:05Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 7..7}
+2026-06-01T06:18:05Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 8..8}
+2026-06-01T06:18:05Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 10..10}
+2026-06-01T06:18:05Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 11..11}
+2026-06-01T06:18:05Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 12..12}
+2026-06-01T06:18:05Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 13..13}
+2026-06-01T06:18:05Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:18:05Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:18:06Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 1..1}
+2026-06-01T06:18:06Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::SetMarkedText {UserInput { .. }, 2..2}
+2026-06-01T06:18:06Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::TypedCharacters
+2026-06-01T06:18:06Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:18:06Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::KeyDown
+2026-06-01T06:18:07Z [INFO] dispatching action for "root_view:maybe_stop_active_voice_input"
+2026-06-01T06:18:07Z [INFO] dispatching global action for root_view:update_quake_mode_state
+2026-06-01T06:18:07Z [INFO] active window changed: None
+2026-06-01T06:18:07Z [INFO] dispatching global action for root_view:update_quake_mode_state
+2026-06-01T06:18:07Z [INFO] dispatching global action for workspace:save_app
+2026-06-01T06:18:09Z [INFO] application did become active
+2026-06-01T06:18:09Z [INFO] active window changed: Some(WindowId(0))
+2026-06-01T06:18:09Z [INFO] dispatching global action for root_view:update_quake_mode_state
+2026-06-01T06:18:09Z [INFO] dispatching global action for workspace:save_app
+2026-06-01T06:18:09Z [INFO] dispatching typed action: warp::terminal::view::action::TerminalAction::ClearMarkedText
+2026-06-01T06:18:10Z [INFO] dispatching typed action: warp::workspace::action::WorkspaceAction::FocusPane(PaneViewLocator { pane_group_id: EntityId(3252), pane_id: PaneId(IPaneId { pane_type: Terminal, pane_view_id: EntityId(3627) }) })
+2026-06-01T06:18:10Z [INFO] dispatching typed action: warp::pane_group::PaneGroupAction::HandleFocusChange
+2026-06-01T06:18:10Z [INFO] dispatching typed action: warp::editor::view::EditorAction::ClearMarkedText
+2026-06-01T06:18:10Z [INFO] dispatching typed action: warp::editor::view::EditorAction::ClearMarkedText
+2026-06-01T06:18:11Z [WARN] Not handling MouseMoved event in Hoverable due to back-to-back synthetic events.
+2026-06-01T06:18:11Z [INFO] dispatching typed action: warp::workspace::action::WorkspaceAction::FocusPane(PaneViewLocator { pane_group_id: EntityId(57772), pane_id: PaneId(IPaneId { pane_type: Terminal, pane_view_id: EntityId(58147) }) })
+2026-06-01T06:18:11Z [INFO] dispatching typed action: warp::pane_group::PaneGroupAction::HandleFocusChange
+2026-06-01T06:18:11Z [INFO] dispatching typed action: warp::editor::view::EditorAction::ClearMarkedText
+2026-06-01T06:18:11Z [INFO] dispatching typed action: warp::editor::view::EditorAction::ClearMarkedText
+2026-06-01T06:18:13Z [INFO] dispatching typed action: warp::workspace::action::WorkspaceAction::CloseTab(4)
+2026-06-01T06:18:13Z [INFO] storing data for closed tab
+2026-06-01T06:18:13Z [INFO] dispatching typed action: warp::pane_group::PaneGroupAction::HandleFocusChange
+2026-06-01T06:18:13Z [INFO] dispatching global action for workspace:save_app
+2026-06-01T06:18:13Z [INFO] dispatching global action for workspace:save_app
+2026-06-01T06:18:13Z [INFO] dispatching global action for workspace:save_app
+2026-06-01T06:18:13Z [WARN] Not handling MouseMoved event in Hoverable due to back-to-back synthetic events.
+2026-06-01T06:18:13Z [INFO] dispatching typed action: warp::editor::view::EditorAction::ClearMarkedText
+2026-06-01T06:18:13Z [INFO] dispatching typed action: warp::editor::view::EditorAction::ClearMarkedText
+2026-06-01T06:18:13Z [WARN] Not handling MouseMoved event in Hoverable due to back-to-back synthetic events.
+2026-06-01T06:18:14Z [WARN] Not handling MouseMoved event in Hoverable due to back-to-back synthetic events.
+2026-06-01T06:18:15Z [INFO] dispatching typed action: warp::workspace::action::WorkspaceAction::CloseTab(4)
+2026-06-01T06:18:15Z [INFO] storing data for closed tab
+2026-06-01T06:18:15Z [INFO] dispatching global action for workspace:save_app
+2026-06-01T06:18:15Z [INFO] dispatching global action for workspace:save_app
+2026-06-01T06:18:15Z [INFO] dispatching global action for workspace:save_app
+2026-06-01T06:18:15Z [WARN] Not handling MouseMoved event in Hoverable due to back-to-back synthetic events.
+2026-06-01T06:18:16Z [INFO] dispatching typed action: warp::editor::view::EditorAction::SetMarkedText { marked_text: UserInput { .. }, selected_range: 1..1 }
+2026-06-01T06:18:16Z [INFO] dispatching typed action: warp::editor::view::EditorAction::SetMarkedText { marked_text: UserInput { .. }, selected_range: 3..3 }
+2026-06-01T06:18:16Z [INFO] dispatching typed action: warp::editor::view::EditorAction::SetMarkedText { marked_text: UserInput { .. }, selected_range: 4..4 }
+2026-06-01T06:18:16Z [INFO] dispatching global action for workspace:save_app
+2026-06-01T06:18:16Z [INFO] dispatching typed action: warp::editor::view::EditorAction::SetMarkedText { marked_text: UserInput { .. }, selected_range: 6..6 }
+2026-06-01T06:18:16Z [INFO] dispatching typed action: warp::editor::view::EditorAction::SetMarkedText { marked_text: UserInput { .. }, selected_range: 5..5 }
+2026-06-01T06:18:16Z [INFO] dispatching global action for workspace:save_app
+2026-06-01T06:18:16Z [INFO] dispatching typed action: warp::editor::view::EditorAction::UserInsert(UserInput { .. })
+2026-06-01T06:18:16Z [INFO] dispatching typed action: warp::editor::view::EditorAction::ClearMarkedText
+2026-06-01T06:18:16Z [INFO] dispatching typed action: warp::editor::view::EditorAction::Enter
+2026-06-01T06:18:16Z [INFO] dispatching typed action: warp::pane_group::PaneGroupAction::HandleFocusChange
+2026-06-01T06:18:16Z [WARN] Received 'end_in_band_command_output' while not expecting to read in-band command output.
+2026-06-01T06:18:16Z [INFO] dispatching typed action: warp::editor::view::EditorAction::ClearMarkedText
+2026-06-01T06:18:16Z [INFO] Received Preexec hook
+2026-06-01T06:18:16Z [INFO] Received Clear hook
+2026-06-01T06:18:17Z [ERROR] thread 'main' panicked at 'index out of bounds: the len is 117 but the index is 117': crates/warp_terminal/src/model/grid/flat_storage/row_iterator.rs:132
