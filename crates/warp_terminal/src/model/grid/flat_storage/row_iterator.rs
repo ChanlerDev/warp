@@ -128,20 +128,8 @@ impl Iterator for RowIterator<'_> {
             // If the grapheme takes up two cells, mark the following cell as
             // a spacer.
             if cell_width == 2 {
-                if idx + 1 < row.len() {
-                    row[idx].flags.insert(Flags::WIDE_CHAR);
-                    row[idx + 1].flags.insert(Flags::WIDE_CHAR_SPACER);
-                } else {
-                    log::warn!(
-                        "Dropped WIDE_CHAR flags for grapheme at the end of a row in \
-                         RowIterator::next!\n\
-                         \tidx: {idx}\n\
-                         \tlen: {}\n\
-                         \tgrapheme runs: {:?}",
-                        row.len(),
-                        self.storage.index.grapheme_runs_for_row(self.row_index)?
-                    );
-                }
+                row[idx].flags.insert(Flags::WIDE_CHAR);
+                row[idx + 1].flags.insert(Flags::WIDE_CHAR_SPACER);
             }
 
             current_offset += grapheme.len();

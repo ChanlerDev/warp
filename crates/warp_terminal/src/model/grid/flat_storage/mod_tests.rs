@@ -303,30 +303,6 @@ fn repro_wide_char_after_pop_rows_117_columns() {
         .collect_vec();
 }
 
-#[test]
-fn test_mismatched_storage_columns_with_trailing_wide_char_is_reflowed() {
-    let mut storage = FlatStorage::new(5, None, None);
-    let mut row = Row::new(6);
-
-    row[0].c = 'a';
-    row[1].c = 'b';
-    row[2].c = 'c';
-    row[3].c = 'd';
-    row[4].c = '中';
-    row[4].flags.insert(Flags::WIDE_CHAR);
-    row[5].flags.insert(Flags::WIDE_CHAR_SPACER);
-
-    storage.push_rows([&row]);
-    let rows = storage.rows_from(0).collect_vec();
-
-    assert_eq!(rows.len(), 2);
-    assert_eq!(rows[0][4].c, '\0');
-    assert!(rows[0][4].flags().contains(Flags::LEADING_WIDE_CHAR_SPACER));
-    assert_eq!(rows[1][0].c, '中');
-    assert!(rows[1][0].flags().contains(Flags::WIDE_CHAR));
-    assert!(rows[1][1].flags().contains(Flags::WIDE_CHAR_SPACER));
-}
-
 /// Construct a Row that violates the wrap invariant: the wide character
 /// is placed at the absolute final cell, with no spacer cell after it.
 /// This mirrors the corrupt state that a buggy upstream resize path
@@ -348,16 +324,19 @@ fn build_corrupt_row_wide_at_end(cols: usize) -> Row {
 }
 
 #[test]
-fn test_corrupt_row_wide_char_at_last_cell_is_reflowed() {
+fn repro_corrupt_row_wide_char_at_last_cell_panics() {
     // Push a hand-built Row whose final cell is marked WIDE_CHAR with no
     // spacer after it.  push_rows -> push_rows_internal goes through
-    // process_grapheme_info_unchecked used to propagate the corruption into
-    // the index. Once RowIterator materialized the row it panicked exactly
+    // process_grapheme_info_unchecked which does NOT enforce the wrap
+    // invariant, so the corruption propagates into the index.  Once
+    // RowIterator tries to materialize the row it should panic exactly
     // like the Apple stack:
     //
     //   index out of bounds: the len is N but the index is N
     //
-    // The checked fallback now reflows the wide character onto a new row.
+    // If this test passes silently, the materializer somehow tolerated
+    // the corruption.  If it panics, we have reproduced the production
+    // crash without going through the UI.
     let cols = 117;
     let row = build_corrupt_row_wide_at_end(cols);
 
@@ -365,38 +344,7 @@ fn test_corrupt_row_wide_char_at_last_cell_is_reflowed() {
     storage.push_rows([&row]);
 
     // pop_rows is the exact entry point in the Apple stack.
-    let rows = storage.pop_rows(2);
-
-    assert_eq!(rows.len(), 2);
-    assert!(rows[0][cols - 1]
-        .flags()
-        .contains(Flags::LEADING_WIDE_CHAR_SPACER));
-    assert_eq!(rows[1][0].c, '中');
-    assert!(rows[1][0].flags().contains(Flags::WIDE_CHAR));
-    assert!(rows[1][1].flags().contains(Flags::WIDE_CHAR_SPACER));
-}
-
-#[test]
-fn test_row_iterator_drops_invalid_trailing_wide_char_flags_from_existing_index() {
-    let cols = 5;
-    let row = build_corrupt_row_wide_at_end(cols);
-    let mut storage = FlatStorage::new(cols, None, None);
-    let mut entry_builder = storage.index.start_row();
-
-    // Simulate an index written by an older Warp build before ingestion
-    // validated right-edge wide characters.
-    for cell in row.dirty_cells() {
-        let grapheme = Grapheme::new_from_cell(cell);
-        entry_builder.process_grapheme_info_unchecked(grapheme.sizing_info());
-        storage.content.push_grapheme(&grapheme);
-    }
-    entry_builder.append_to_index(&mut storage.index);
-
-    let rows = storage.rows_from(0).collect_vec();
-
-    assert_eq!(rows.len(), 1);
-    assert_eq!(rows[0][cols - 1].c, '中');
-    assert!(!rows[0][cols - 1].flags().contains(Flags::WIDE_CHAR));
+    let _ = storage.pop_rows(1);
 }
 
 #[test]
