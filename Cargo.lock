@@ -15115,6 +15115,7 @@ dependencies = [
  "lazy_static",
  "log",
  "pathfinder_color",
+ "rand 0.8.6",
  "regex",
  "serde",
  "session-sharing-protocol",

@@ -411,3 +411,265 @@ fn test_clear_after_truncate_front() {
         '2'
     );
 }
+
+// === Proptest: reflow fuzz for RowIterator crash (Apple crash 2026-06-01) ===
+//
+// Randomly generates CJK + ASCII content, pushes it into FlatStorage at one
+// column width, calls set_columns to a different width (triggering
+// Index::rebuild), then materializes all rows through RowIterator::next.
+//
+// This directly targets Hypothesis B from the crash report: a reflow
+// boundary bug in Index::rebuild that could leave a WIDE_CHAR in the
+// last cell with no spacer after it, causing RowIterator::next to panic
+// at row[idx + 1].
+
+#[test]
+fn fuzz_reflow_wide_char_no_panic() {
+    // CJK/emoji characters known to have cell_width == 2
+    const WIDE_CHARS: &[&str] = &["中", "说", "😀", "汉", "字", "语", "文", "明"];
+    const ASCII_CHARS: &[char] = &['a', 'b', 'c', 'x', 'y', 'z', '0', '1', '2'];
+
+    use rand::Rng;
+
+    let mut rng = rand::thread_rng();
+    let mut buf = String::new();
+    const ITERATIONS: usize = 100_000;
+
+    // Column widths matching the Apple crash report scenario:
+    // crash had 117 columns; panic at index 155 suggests
+    // 155-column width.  Test both small (to maximize edge
+    // density) and large (to match real crash) ranges.
+    const COL_RANGES: &[(usize, usize)] = &[(2, 21), (50, 201)];
+    const COL_RANGES_LARGE: &[(usize, usize)] = &[(2, 21), (80, 201)];
+
+    for _ in 0..ITERATIONS {
+        buf.clear();
+
+        // Use the wider column range 80% of the time to match
+        // real crash scenarios.
+        let range = if rng.gen_bool(0.8) {
+            COL_RANGES_LARGE[rng.gen_range(0..COL_RANGES_LARGE.len())]
+        } else {
+            COL_RANGES[rng.gen_range(0..COL_RANGES.len())]
+        };
+        let cols_src: usize = rng.gen_range(range.0..range.1);
+        let cols_dst: usize = rng.gen_range(range.0..range.1);
+        let num_rows: usize = rng.gen_range(1..51);
+
+        // Generate random content: for each row, fill with random
+        // mix of ASCII and wide chars, capped at cols_src width
+        for _ in 0..num_rows {
+            let mut row_cells = 0usize;
+            loop {
+                let is_wide = rng.gen_bool(0.4);
+                let cell_w = if is_wide { 2 } else { 1 };
+                if row_cells + cell_w > cols_src {
+                    break;
+                }
+                row_cells += cell_w;
+                if is_wide {
+                    let idx: usize = rng.gen_range(0..WIDE_CHARS.len());
+                    buf.push_str(WIDE_CHARS[idx]);
+                } else {
+                    let idx: usize = rng.gen_range(0..ASCII_CHARS.len());
+                    buf.push(ASCII_CHARS[idx]);
+                }
+            }
+            buf.push('\n');
+        }
+
+        let rows = buf.as_str().to_rows(cols_src);
+        let mut storage = FlatStorage::new(cols_src, None, None);
+        storage.push_rows(&rows);
+
+        if cols_src != cols_dst {
+            storage.set_columns(cols_dst);
+        }
+
+        // Materialize all rows — if RowIterator panics, the test fails.
+        for row in storage.rows_from(0) {
+            let row = row.as_ref();
+            // Invariant: if the last cell is WIDE_CHAR, it must have
+            // a WIDE_CHAR_SPACER in cell after it (impossible if
+            // it's truly the last cell).
+            let last = row.occ - 1;
+            if last < row.len() && row[last].flags().contains(Flags::WIDE_CHAR) {
+                assert!(
+                    last + 1 < row.len() && row[last + 1].flags().contains(Flags::WIDE_CHAR_SPACER),
+                    "row has WIDE_CHAR at last cell ({last}/{}) without WIDE_CHAR_SPACER\n\
+                     cols_src={cols_src} cols_dst={cols_dst} content={buf:?}",
+                    row.len(),
+                );
+            }
+        }
+    }
+}
+
+/// Hypothesis A: column-mismatch repro.
+///
+/// Push a valid 155-col Row (WIDE_CHAR at pos 116, spacer at 117) into
+/// a 117-col FlatStorage.  `push_rows_internal` uses `self.columns` (117)
+/// for the WRAPLINE check but `process_grapheme_info_unchecked` records
+/// all 118 source cells.  The Index entry totals 118 cells, so
+/// RowIterator materializes a 117-cell Row and panics at `row[idx + 1]`.
+///
+/// This mirrors the Apple crash: 117-col terminal, panics at index 117.
+#[test]
+#[should_panic(expected = "index out of bounds")]
+fn repro_push_rows_column_mismatch_panics() {
+    let cols_big: usize = 155;
+    let cols_small: usize = 117;
+
+    // Build a 155-col Row where a WIDE_CHAR is at source position 116
+    // (spacer at 117).  This mirrors the crash: 117-col terminal,
+    // panics at `row[117]`.
+    let mut row = Row::new(cols_big);
+    // Fill 0..116 with ASCII.
+    for i in 0..116 {
+        row[i].c = ('a' as u32 + (i as u32 % 26)) as u8 as char;
+    }
+    // WIDE_CHAR at position 116, spacer at 117.
+    row[116].c = '中';
+    row[116].flags.insert(Flags::WIDE_CHAR);
+    row[117].flags.insert(Flags::WIDE_CHAR_SPACER);
+    // Fill remaining positions to make row full (occ = cols_big).
+    for i in 118..cols_big {
+        row[i].c = 'x';
+    }
+    // Mark row as full so push_rows_internal sees it.
+    row.occ = cols_big;
+    row[cols_big - 1].flags.insert(Flags::WRAPLINE);
+
+    assert!(row[116].flags().contains(Flags::WIDE_CHAR));
+    assert!(row[117].flags().contains(Flags::WIDE_CHAR_SPACER));
+
+    // Push into FlatStorage that has FEWER columns.
+    let mut storage = FlatStorage::new(cols_small, None, None);
+    storage.push_rows([&row]);
+
+    // Materialization panics at row_iterator.rs:132.
+    let _ = storage.pop_rows(1);
+}
+
+/// Fuzz for Hypothesis A: random wide rows pushed into narrow FlatStorage.
+///
+/// Builds valid rows at a wider column count, then pushes them into a
+/// narrower FlatStorage — the exact column-mismatch scenario that can
+/// happen in CLI Agent mode (resize changes flat_storage.columns but
+/// subsequent scroll_region_up pushes grid rows at the old width).
+#[test]
+fn fuzz_column_mismatch_produces_corrupt_index() {
+    use rand::Rng;
+    use std::panic::catch_unwind;
+
+    let mut rng = rand::thread_rng();
+    const ITERATIONS: usize = 20_000;
+    let mut panics = 0usize;
+
+    for _ in 0..ITERATIONS {
+        let cols_small: usize = rng.gen_range(5..51);
+        let cols_big: usize = cols_small + rng.gen_range(1..31);
+
+        // Build a cols_big-wide Row with a random layout.
+        let mut row = Row::new(cols_big);
+        let wide_pos: usize = rng.gen_range(0..cols_big - 1);
+        for i in 0..cols_big {
+            if i == wide_pos {
+                // WIDE_CHAR at this position
+                row[i].c = '中';
+                row[i].flags.insert(Flags::WIDE_CHAR);
+            } else if i == wide_pos + 1 {
+                row[i].flags.insert(Flags::WIDE_CHAR_SPACER);
+            } else {
+                row[i].c = rng.gen_range('a'..='z');
+            }
+        }
+        row.occ = cols_big;
+        row[cols_big - 1].flags.insert(Flags::WRAPLINE);
+
+        let mut storage = FlatStorage::new(cols_small, None, None);
+        storage.push_rows([&row]);
+
+        let result = catch_unwind(std::panic::AssertUnwindSafe(|| {
+            let _ = storage.pop_rows(1);
+        }));
+
+        if result.is_err() {
+            panics += 1;
+        }
+    }
+
+    // At least some column-mismatch combos should trigger the panic.
+    // The exact count depends on random seed, but we need at least 1.
+    assert!(panics > 0, "no column-mismatch scenarios triggered panic");
+    eprintln!("column-mismatch fuzz: {panics}/{ITERATIONS} iterations panicked");
+}
+
+/// Focused fuzz: continuous wide characters only (no ASCII).
+///
+/// Pure CJK rows maximize the chance that a WIDE_CHAR lands on the
+/// last column without a spacer.  With 100_000 random column pairs
+/// in a wider range, this explicitly targets the Index::rebuild
+/// reflow boundary.
+///
+/// Independent of `fuzz_reflow_wide_char_no_panic` — this one does
+/// not mix in ASCII, so every grapheme is 2 cells wide.
+#[test]
+fn fuzz_reflow_continuous_wide_only() {
+    const WIDE_CHARS: &[&str] = &["中", "说", "😀", "汉", "字", "语", "文", "明", "好", "和"];
+
+    use rand::Rng;
+    let mut rng = rand::thread_rng();
+    let mut buf = String::new();
+    const ITERATIONS: usize = 50_000;
+
+    for _ in 0..ITERATIONS {
+        buf.clear();
+
+        // Wide columns matching real crash: crash text shows 155 cols,
+        // production resize happens at 117.  Focus on these ranges.
+        let cols_src: usize = rng.gen_range(50..201);
+        let cols_dst: usize = rng.gen_range(50..201);
+        let num_rows: usize = rng.gen_range(5..51);
+
+        for _ in 0..num_rows {
+            // Fill the row with wide chars only.  For an odd-width
+            // column, the last cell position is always available for a
+            // WIDE_CHAR to land on without a following spacer.
+            let num_wide = cols_src / 2;
+            for _ in 0..num_wide {
+                let idx = rng.gen_range(0..WIDE_CHARS.len());
+                buf.push_str(WIDE_CHARS[idx]);
+            }
+            buf.push('\n');
+        }
+
+        let rows = buf.as_str().to_rows(cols_src);
+        let mut storage = FlatStorage::new(cols_src, None, None);
+        storage.push_rows(&rows);
+
+        if cols_src != cols_dst {
+            storage.set_columns(cols_dst);
+        }
+
+        for row in storage.rows_from(0) {
+            let row = row.as_ref();
+            for col in 0..row.occ {
+                if row[col].flags().contains(Flags::WIDE_CHAR) {
+                    assert!(
+                        col + 1 < row.len(),
+                        "WIDE_CHAR at absolute last cell ({col}/{}) — \
+                         no room for spacer! cols_src={cols_src} cols_dst={cols_dst}",
+                        row.len(),
+                    );
+                    assert!(
+                        row[col + 1].flags().contains(Flags::WIDE_CHAR_SPACER),
+                        "WIDE_CHAR at {col} missing WIDE_CHAR_SPACER at {next} — \
+                         cols_src={cols_src} cols_dst={cols_dst}",
+                        next = col + 1,
+                    );
+                }
+            }
+        }
+    }
+}

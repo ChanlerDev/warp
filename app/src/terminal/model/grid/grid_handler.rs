@@ -2571,6 +2571,11 @@ impl GridHandler {
     /// WIDE_CHAR at the last cell causes `row[idx + 1]` to go out of
     /// bounds.  The corrupt state cannot be produced through normal PTY
     /// I/O — it was created by a buggy resize path in `push_rows_internal`.
+    ///
+    /// Prefer `inject_corrupt_row_into_last_grid_row_for_test` for
+    /// integration tests, as it exercises the full `resize_storage` →
+    /// `pop_rows` → `RowIterator::next` call chain rather than bypassing
+    /// it.
     #[cfg(any(test, feature = "integration_tests"))]
     pub fn push_corrupt_row_for_test(&mut self, cols: usize) {
         let mut row = Row::new(cols);
@@ -2585,6 +2590,33 @@ impl GridHandler {
         row.occ = cols;
         self.flat_storage.push_rows_without_truncation([&row]);
         self.flat_storage.pop_rows(1);
+    }
+
+    /// Constructs a corrupt row (WIDE_CHAR in last cell, no trailing
+    /// WIDE_CHAR_SPACER) and replaces the last visible row of the grid
+    /// with it.  Does NOT call `pop_rows` — the row will be materialized
+    /// through `RowIterator::next` when the next `resize_storage` runs
+    /// (e.g. triggered by a pane split or window resize).
+    ///
+    /// This exercises the full crash call chain:
+    ///   after_terminal_view_layout → resize_internal →
+    ///   TerminalModel::resize → BlockList::resize →
+    ///   GridHandler::resize → resize_storage → pop_rows →
+    ///   RowIterator::next
+    #[cfg(any(test, feature = "integration_tests"))]
+    pub fn inject_corrupt_row_into_last_grid_row_for_test(&mut self, cols: usize) {
+        let mut row = Row::new(cols);
+        for i in 0..cols.saturating_sub(1) {
+            row[i].c = ('a' as u32 + (i as u32 % 26)) as u8 as char;
+        }
+        if cols > 0 {
+            let last = &mut row[cols - 1];
+            last.c = '\u{4e2d}';
+            last.flags.insert(Flags::WIDE_CHAR);
+        }
+        row.occ = cols;
+        let last_visible = self.grid.visible_rows().saturating_sub(1);
+        self.grid[VisibleRow(last_visible)] = row;
     }
 
     /// Inserts the characters within `text` into the grid starting at the

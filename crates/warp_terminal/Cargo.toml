@@ -36,6 +36,7 @@ warp_util.workspace = true
 warpui.workspace = true
 
 [dev-dependencies]
+rand.workspace = true
 unicode-segmentation = "1.11.0"
 
 [features]

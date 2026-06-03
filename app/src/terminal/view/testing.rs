@@ -127,6 +127,17 @@ impl TerminalView {
         &self.find_model
     }
 
+    /// Test-only: injects a corrupt row (WIDE_CHAR in last cell, no spacer)
+    /// into the last visible grid row.  Only available in test/integration
+    /// builds.
+    #[cfg(any(test, feature = "integration_tests"))]
+    pub fn inject_corrupt_row_into_last_grid_row_for_test(&self) {
+        let mut model = self.model.lock();
+        let cols = model.block_list().active_block().size().columns();
+        let gh = model.block_list_mut().active_block_mut().grid_handler_mut();
+        gh.inject_corrupt_row_into_last_grid_row_for_test(cols);
+    }
+
     #[cfg(test)]
     pub fn rich_content_view_count_for_test(&self) -> usize {
         self.rich_content_views.len()

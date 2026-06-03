@@ -2438,6 +2438,100 @@ fn test_full_grid_clear_resize_narrower_then_scroll_does_not_panic() {
     }
 }
 
+/// Reproduces the RowIterator crash through the real user-facing API:
+/// `GridHandler::resize()` with `FullGridClearBehavior::Clear` (CLI agent
+/// mode).  The test puts a properly-formed CJK row (WIDE_CHAR at position
+/// 116, spacer at 117) into the grid at 155 cols, then calls
+/// `grid.resize()` to shrink to 117 cols.  With Clear behavior the
+/// early-return path of `resize_storage` kicks in and delegates to
+/// `GridStorage::resize(false, …)` which calls `shrink_cols(reflow=false)`.
+///
+/// `shrink_cols(reflow=false)` truncates the row to 117 cells:
+/// the WIDE_CHAR at position 116 is preserved but the spacer at position
+/// 117 is dropped.  The grid now holds a corrupt row (WIDE_CHAR in the
+/// last cell, no trailing spacer).
+///
+/// When that row is pushed into flat_storage (e.g. via scroll) and later
+/// materialised through `pop_rows` (e.g. via `finish()` or another resize
+/// at the same column count where `set_columns` is a no-op),
+/// `RowIterator::next` panics at `row[idx+1]` because the WIDE_CHAR at
+/// index 116 demands a spacer at index 117 that does not exist.
+///
+/// Apple crash report:
+///   RowIterator::next → FlatStorage::pop_rows →
+///   GridHandler::resize_storage → GridHandler::resize → …
+/// panicked at row_iterator.rs:132:20
+///   index out of bounds: the len is 117 but the index is 117
+#[test]
+fn repro_shrink_cols_reflow_false_creates_corrupt_row_that_panics_on_pop() {
+    use crate::terminal::model::cell::Flags;
+
+    let wide_cols: usize = 155;
+    let narrow_cols: usize = 117;
+
+    // Create a grid at the wider width with Clear behavior so resizes
+    // take the early-return path (matching CLI agent mode).
+    let mut grid = GridHandler::new_for_test(3, wide_cols);
+    grid.enable_full_grid_clear_behavior();
+
+    // Place a properly-formed row into the visible grid: 116 ASCII cells,
+    // then a CJK WIDE_CHAR at position 116, spacer at position 117.
+    {
+        let vis = VisibleRow(0);
+        for i in 0..116 {
+            grid.grid_storage_mut()[vis][i].c = char::from(b'a' + (i as u8 % 26));
+        }
+        grid.grid_storage_mut()[vis][116].c = '\u{4e2d}'; // 中
+        grid.grid_storage_mut()[vis][116]
+            .flags
+            .insert(Flags::WIDE_CHAR);
+        grid.grid_storage_mut()[vis][117]
+            .flags
+            .insert(Flags::WIDE_CHAR_SPACER);
+        grid.grid_storage_mut()[vis].occ = 155;
+    }
+
+    // Shrink via the real resize API.  With Clear + !finished, this hits
+    // the early-return branch of resize_storage, which delegates to
+    // GridStorage::resize(false, 3, 117, false).
+    // shrink_cols(reflow=false) truncates the row and drops the spacer
+    // at position 117, leaving a WIDE_CHAR at the last cell of a 117-col
+    // row.
+    grid.resize(SizeInfo::new_without_font_metrics(3, narrow_cols));
+
+    // Verify the grid row is now corrupt.
+    {
+        let row = &grid.grid_storage()[VisibleRow(0)];
+        let last_cell = &row[narrow_cols - 1];
+        assert!(
+            last_cell.flags.contains(Flags::WIDE_CHAR),
+            "shrink_cols(reflow=false) must preserve WIDE_CHAR at last \
+             cell to reproduce the crash"
+        );
+        assert!(
+            row.len() == narrow_cols,
+            "row should have been truncated to new width"
+        );
+    }
+
+    // Push the corrupt row into flat_storage — this is what
+    // scroll_region_up would do during normal terminal operation.
+    // Extract the row first to avoid a double borrow of `grid`.
+    let corrupt = grid.grid_storage()[VisibleRow(0)].clone();
+    grid.flat_storage.push_rows_without_truncation([&corrupt]);
+
+    // Materialise the corrupt entry through pop_rows.
+    // With the fix, this must not panic.
+    let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+        grid.flat_storage.pop_rows(1);
+    }));
+
+    assert!(
+        result.is_ok(),
+        "pop_rows on a row corrupted by shrink_cols(reflow=false) should not panic"
+    );
+}
+
 #[test]
 fn test_full_grid_clear_resize_then_bounds_to_string_does_not_panic() {
     // End-to-end repro via the same code path as block_snapshot:
