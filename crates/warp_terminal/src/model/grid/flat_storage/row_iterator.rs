@@ -126,9 +126,8 @@ impl Iterator for RowIterator<'_> {
             }
 
             // If the grapheme takes up two cells, mark the following cell as
-            // a spacer. Guard against corrupt data where a WIDE_CHAR appears
-            // at the last column with no room for the spacer.
-            if cell_width == 2 && idx + 1 < row.len() {
+            // a spacer.
+            if cell_width == 2 {
                 row[idx].flags.insert(Flags::WIDE_CHAR);
                 row[idx + 1].flags.insert(Flags::WIDE_CHAR_SPACER);
             }
