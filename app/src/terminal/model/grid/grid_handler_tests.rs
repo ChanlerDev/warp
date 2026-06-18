@@ -2279,6 +2279,40 @@ fn test_full_grid_clear_resize_narrower_then_scroll_does_not_panic() {
 }
 
 #[test]
+fn test_full_grid_clear_split_wide_char_boundary_does_not_panic_on_materialization() {
+    let old_cols = 6;
+    let new_cols = 5;
+    let num_rows = 1;
+
+    let mut grid =
+        GridHandler::new_for_test_with_scroll_limit(num_rows, old_cols, MAX_SCROLL_LIMIT);
+    for c in ['a', 'b', 'c', 'd', 'Ｗ'] {
+        grid.input(c);
+    }
+
+    assert!(grid.grid_storage()[VisibleRow(0)][new_cols - 1]
+        .flags
+        .contains(Flags::WIDE_CHAR));
+    assert!(grid.grid_storage()[VisibleRow(0)][new_cols]
+        .flags
+        .contains(Flags::WIDE_CHAR_SPACER));
+
+    grid.enable_full_grid_clear_behavior();
+    grid.resize(SizeInfo::new_without_font_metrics(num_rows, new_cols));
+
+    let retained_row = grid.grid_storage()[VisibleRow(0)].clone();
+    grid.flat_storage.push_rows([&retained_row]);
+    let materialized_rows = grid.flat_storage.pop_rows(1);
+
+    assert_eq!(materialized_rows.len(), 1);
+    assert_eq!(
+        grid.grid_storage()[VisibleRow(0)][new_cols - 1],
+        Cell::default()
+    );
+    assert_eq!(materialized_rows[0][new_cols - 1], Cell::default());
+}
+
+#[test]
 fn test_full_grid_clear_resize_then_bounds_to_string_does_not_panic() {
     // End-to-end repro via the same code path as block_snapshot:
     // bounds_to_string → line_to_string → row() → RowIterator::next.
