@@ -16,10 +16,10 @@ Non-goals:
 - Changing the visual semantics of valid wrapped wide characters.
 ## Behavior
 1. When Warp receives a full-grid clear sequence and the terminal is resized before the command is finished, the active grid resizes without reflowing old terminal output into scrollback.
-2. If that no-reflow resize shrinks the terminal width and the first discarded cell is the spacer for a wide character retained at the new final column, the resulting row remains valid for later rendering, scrolling, and scrollback-like storage. Warp must not leave a final-column wide character that requires a spacer outside the row bounds.
-3. For that truncated boundary pair, Warp resets the retained final cell to the resize-empty cell instead of preserving the leading glyph as a single-cell character. This matches existing clear/overwrite behavior for the spacer half of a wide-character pair and applies only to the split boundary pair.
+2. If that no-reflow resize shrinks the terminal width and the retained final cell is a wide character, the resulting row remains valid for later rendering, scrolling, and scrollback-like storage. Warp must not leave a final-column wide character that requires a spacer outside the row bounds.
+3. For that invalid trailing wide character, Warp resets the retained final cell's foreground/content state instead of preserving the leading glyph as a single-cell character. The reset preserves the cell background, matching existing clear/overwrite behavior for wide-character boundary repairs.
 4. Valid wide-character pairs wholly inside the new width remain unchanged. A wide character whose spacer is still retained continues to occupy two cells and must still materialize with its matching spacer.
-5. Wide-character spacers wholly outside the new width are discarded with the rest of the overflow content. If the first discarded spacer belongs to the retained final cell, that retained leading cell is reset; otherwise discarding overflow content must not mutate unrelated retained cells.
+5. Wide-character spacers wholly outside the new width are discarded with the rest of the overflow content. If discarding overflow leaves the retained row ending in `WIDE_CHAR`, that retained leading cell is reset; otherwise discarding overflow content must not mutate unrelated retained cells.
 6. Rows produced by this clear-driven no-reflow resize path must not contain:
    - a `WIDE_CHAR` marker without a following `WIDE_CHAR_SPACER` in the same row, or
    - a `WIDE_CHAR_SPACER` marker without a preceding `WIDE_CHAR` in the same row.

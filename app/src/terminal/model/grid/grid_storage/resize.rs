@@ -342,7 +342,7 @@ impl GridStorage {
                 // Remove all cells which require reflowing.
                 let shrunk = row.shrink(columns);
                 if !reflow {
-                    reset_discarded_wide_char_boundary(&mut row, shrunk.as_deref(), columns);
+                    reset_invalid_trailing_wide_char(&mut row, columns);
                 }
 
                 let mut wrapped = match shrunk {
@@ -482,24 +482,10 @@ impl GridStorage {
     }
 }
 
-fn reset_discarded_wide_char_boundary(
-    row: &mut Row,
-    discarded_cells: Option<&[Cell]>,
-    columns: usize,
-) {
-    if columns == 0 {
+fn reset_invalid_trailing_wide_char(row: &mut Row, columns: usize) {
+    if columns == 0 || !row[columns - 1].flags().contains(Flags::WIDE_CHAR) {
         return;
     }
-
-    let Some(first_discarded_cell) = discarded_cells.and_then(|cells| cells.first()) else {
-        return;
-    };
-
-    if row[columns - 1].flags().contains(Flags::WIDE_CHAR)
-        && first_discarded_cell
-            .flags()
-            .contains(Flags::WIDE_CHAR_SPACER)
-    {
-        row[columns - 1] = Cell::default();
-    }
+    let bg = row[columns - 1].bg;
+    row[columns - 1] = bg.into();
 }

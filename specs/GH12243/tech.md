@@ -29,16 +29,15 @@ The important ownership boundary is that `RowIterator::next` is the panic site, 
 ## Proposed changes
 ### 1. Repair the confirmed producer path in `GridStorage::shrink_cols`
 In `app/src/terminal/model/grid/grid_storage/resize.rs`, keep the fix localized to the branch where `GridStorage::shrink_cols` has just called `row.shrink(columns)`.
-After `row.shrink(columns)` returns discarded cells, handle the no-reflow split-wide-character case before the non-reflow branch pushes the shortened row into `new_raw`:
-- Capture the discarded cells returned by `row.shrink(columns)` instead of matching and discarding them immediately.
-- If `!reflow`, `columns > 0`, the retained final cell has `WIDE_CHAR`, and the first discarded cell has `WIDE_CHAR_SPACER`, reset the retained final cell to the resize-empty cell.
-- Continue to pass the captured discarded cells into the existing `reflow=true` branch unchanged.
-This satisfies `product.md` behavior 2-6 by repairing exactly the row whose spacer was discarded. Resetting the retained leading cell matches the existing overwrite/clear behavior for a spacer-half operation and avoids pretending that a width-2 glyph has a valid one-cell representation.
-This intentionally discards the boundary glyph. That is consistent with this no-reflow path: right-side overflow cells are already discarded, and once the spacer half has been discarded the retained leading half is no longer independently renderable.
+After `row.shrink(columns)` returns, handle the no-reflow split-wide-character case before the non-reflow branch pushes the shortened row into `new_raw`:
+- If `!reflow`, `columns > 0`, and the retained final cell has `WIDE_CHAR`, reset that cell to an empty cell with the same background.
+- Continue to pass the discarded cells returned by `row.shrink(columns)` into the existing `reflow=true` branch unchanged.
+This satisfies `product.md` behavior 2-6 by repairing rows that would otherwise end with an orphaned `WIDE_CHAR`. Resetting the retained leading cell matches the existing overwrite/clear behavior for wide-character boundary operations and avoids pretending that a width-2 glyph has a valid one-cell representation.
+This intentionally discards the boundary glyph. That is consistent with this no-reflow path: right-side overflow cells are already discarded, and once the spacer half is not present in the retained row the retained leading half is no longer independently renderable. The reset preserves the cell background so resize does not create a visual hole in applications that paint non-default backgrounds.
 ### 2. Do not move this fix into `Row::shrink`
 `Row::shrink` only knows that cells were split off. It does not know whether the caller will discard those cells, reflow them into wrapped rows, or transform them with leading-spacer semantics. Its return value should preserve the original discarded cell flags so callers can decide how to handle a split wide-character pair. A generic `Row::shrink` cleanup that removes `WIDE_CHAR` whenever the first discarded cell is a spacer would also affect callers that still intend to preserve or reflow the wide character.
 Keeping the fix in `GridStorage::shrink_cols` preserves the caller-specific distinction:
-- `reflow=false`: overflow is discarded, so a retained final `WIDE_CHAR` whose spacer was discarded must be reset rather than materialized as a one-cell glyph.
+- `reflow=false`: overflow is discarded, so a retained final `WIDE_CHAR` must be reset rather than materialized as a one-cell glyph.
 - `reflow=true`: overflow is wrapped, and the existing code moves a trailing `WIDE_CHAR` into wrapped content while placing a `LEADING_WIDE_CHAR_SPACER` in the retained row.
 This directly protects `product.md` behavior 7.
 ### 3. Do not use `RowIterator::next` as the primary repair
@@ -57,7 +56,7 @@ The test should:
 3. Build a valid wide-character pair exactly at the shrink boundary, preferably through the normal grid input path so `WIDE_CHAR` and `WIDE_CHAR_SPACER` are produced by terminal writing rather than hand-set flags.
 4. Resize through the real `grid.resize(SizeInfo::new_without_font_metrics(...))` API so the test exercises `GridHandler::resize_storage` and `GridStorage::shrink_cols`.
 5. Use `assert_no_orphaned_wide_chars` to assert the row invariant.
-6. Assert the exact boundary postcondition: the final retained cell is reset to the resize-empty cell and no retained cell contains an orphaned `WIDE_CHAR` or `WIDE_CHAR_SPACER`.
+6. Assert the exact boundary postcondition: the final retained cell is reset to an empty cell preserving the original background, and no retained cell contains an orphaned `WIDE_CHAR` or `WIDE_CHAR_SPACER`.
 7. Push the post-resize retained row through a `FlatStorage` whose column count matches the resized grid width, then call `flat_storage.pop_rows(1)` and assert one row materializes without panic and keeps the boundary cell reset.
 This is slightly stronger than only asserting "does not panic" because it proves the producer invariant before flat storage gets involved.
 ### 5. Add a resize-specific `reflow=true` guard

@@ -2279,7 +2279,7 @@ fn test_full_grid_clear_resize_narrower_then_scroll_does_not_panic() {
 }
 
 #[test]
-fn test_full_grid_clear_split_wide_char_boundary_does_not_panic_on_materialization() {
+fn test_full_grid_clear_shrink_cols_does_not_orphan_wide_char_at_boundary() {
     let old_cols = 6;
     let new_cols = 5;
     let num_rows = 1;
@@ -2289,6 +2289,7 @@ fn test_full_grid_clear_split_wide_char_boundary_does_not_panic_on_materializati
     for c in ['a', 'b', 'c', 'd', 'Ｗ'] {
         grid.input(c);
     }
+    grid.grid_storage_mut()[VisibleRow(0)][new_cols - 1].bg = Color::Named(NamedColor::Red);
 
     assert!(grid.grid_storage()[VisibleRow(0)][new_cols - 1]
         .flags
@@ -2300,6 +2301,8 @@ fn test_full_grid_clear_split_wide_char_boundary_does_not_panic_on_materializati
     grid.enable_full_grid_clear_behavior();
     grid.resize(SizeInfo::new_without_font_metrics(num_rows, new_cols));
 
+    assert_no_orphaned_wide_chars(&grid, VisibleRow(0));
+
     let retained_row = grid.grid_storage()[VisibleRow(0)].clone();
     grid.flat_storage.push_rows([&retained_row]);
     let materialized_rows = grid.flat_storage.pop_rows(1);
@@ -2307,9 +2310,12 @@ fn test_full_grid_clear_split_wide_char_boundary_does_not_panic_on_materializati
     assert_eq!(materialized_rows.len(), 1);
     assert_eq!(
         grid.grid_storage()[VisibleRow(0)][new_cols - 1],
-        Cell::default()
+        Cell::from(Color::Named(NamedColor::Red))
     );
-    assert_eq!(materialized_rows[0][new_cols - 1], Cell::default());
+    assert_eq!(
+        materialized_rows[0][new_cols - 1],
+        Cell::from(Color::Named(NamedColor::Red))
+    );
 }
 
 #[test]
